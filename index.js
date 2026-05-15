@@ -30,9 +30,17 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 15000, // Wait 15s before timeout
+})
     .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('Could not connect to MongoDB', err));
+    .catch((err) => {
+        console.error('Could not connect to MongoDB', err);
+        // Log more details to help debug
+        if (err.message.includes('buffering timed out')) {
+            console.log('TIP: Check if your IP is whitelisted in MongoDB Atlas (Network Access -> 0.0.0.0/0)');
+        }
+    });
 
 // Routes
 const providerRoutes = require('./routes/provider');
