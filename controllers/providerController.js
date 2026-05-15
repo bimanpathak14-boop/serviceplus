@@ -3,6 +3,7 @@ const ProviderService = require('../models/ProviderService');
 const Provider = require('../models/Provider');
 const Ride = require('../models/Ride');
 const User = require('../models/User');
+const Booking = require('../models/Booking');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -206,7 +207,7 @@ exports.updateRole = (req, res) => {
     res.json({ success: true, message: "Role updated successfully" });
 };
 
-const Booking = require('../models/Booking');
+
 
 exports.getBookings = async (req, res) => {
     try {
@@ -679,8 +680,6 @@ exports.requestPayout = async (req, res) => {
     }
 };
 
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
     try {
