@@ -575,21 +575,25 @@ exports.submitOnboarding = async (req, res) => {
         let updateFields = {
             name: parsedProfile?.name,
             email: parsedProfile?.email,
-            category: parsedProfile?.category || 'transport',
             documents: docs,
             bankDetails: parsedBank,
             isVerified: false,
             verified: false
         };
 
-        // If transport/driver, handle vehicle details
+        // Set category based on vehicle type or role passed
         if (parsedProfile?.vehicleDetails) {
+            // Mapping '2' to e-rickshaw and '3' to auto/tempo based on frontend IDs
+            const vType = parsedProfile.vehicleDetails.type;
+            updateFields.category = vType === '2' ? 'e-rickshaw' : vType === '3' ? 'tempo' : 'transport';
+            
             updateFields.services = [{
                 category: 'transport',
-                subCategory: parsedProfile.vehicleDetails.type, // '2' or '3'
-                price: parsedProfile.vehicleDetails.type === '3' ? 30 : 10 // Default base price
+                subCategory: updateFields.category,
+                price: vType === '3' ? 30 : 10 
             }];
-            updateFields.category = 'transport';
+        } else {
+            updateFields.category = parsedProfile?.category || 'transport';
         }
 
         const updatedProvider = await Provider.findOneAndUpdate(
@@ -729,7 +733,7 @@ exports.register = async (req, res) => {
             email,
             password,
             phone: phone || "",
-            category: category || 'transport',
+            category: category || null,
             isVerified: false,  // Must be false for admin verification flow
             verified: false,
             status: 'offline',
