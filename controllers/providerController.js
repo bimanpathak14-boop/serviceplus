@@ -683,16 +683,24 @@ exports.requestPayout = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({ success: false, message: "Email and password required" });
-
-        let provider = await Provider.findOne({ email });
+        const { email, password, phone } = req.body;
         
-        if (!provider) {
-            return res.status(404).json({ success: false, message: "Provider not found. Please register." });
+        let query = {};
+        if (email) {
+            query.email = email;
+        } else if (phone) {
+            query.phone = phone;
+        } else {
+            return res.status(400).json({ success: false, message: "Email or Phone required" });
         }
 
-        if (!provider || !(await provider.comparePassword(password))) {
+        let provider = await Provider.findOne(query);
+        
+        if (!provider) {
+            return res.status(404).json({ success: false, message: "Partner not found. Please register." });
+        }
+
+        if (!(await provider.comparePassword(password))) {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
 
